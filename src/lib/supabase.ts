@@ -1,83 +1,31 @@
 import { createClient } from '@supabase/supabase-js';
-import { mockApi, mockProducts, mockUser } from './mockData';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-// Check if Supabase credentials are available
-const hasSupabaseCredentials = supabaseUrl && supabaseAnonKey && 
-  supabaseUrl !== 'your_supabase_url_here' && 
-  supabaseAnonKey !== 'your_supabase_anon_key_here';
-
-export const supabase = hasSupabaseCredentials 
-  ? createClient(supabaseUrl, supabaseAnonKey, {
-      auth: {
-        persistSession: true,
-        autoRefreshToken: true,
-      },
-      realtime: {
-        params: {
-          eventsPerSecond: 10,
-        },
-      },
-    })
-  : null;
-
-// Mock Supabase client for local development
-export const mockSupabase = {
+// Create Supabase client
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
-    signInWithPassword: mockApi.signIn,
-    signUp: mockApi.signUp,
-    signOut: mockApi.signOut,
-    signInWithOAuth: async () => ({ data: null, error: { message: 'OAuth not available in mock mode' } }),
-    getSession: async () => {
-      const user = localStorage.getItem('mock_user');
-      return { 
-        data: { 
-          session: user ? { user: JSON.parse(user), access_token: 'mock-token' } : null 
-        }, 
-        error: null 
-      };
-    },
-    onAuthStateChange: (callback: any) => {
-      // Simulate auth state change
-      setTimeout(() => {
-        const user = localStorage.getItem('mock_user');
-        callback('SIGNED_IN', user ? { user: JSON.parse(user) } : null);
-      }, 100);
-      return { data: { subscription: { unsubscribe: () => {} } } };
-    }
+    persistSession: true,
+    autoRefreshToken: true,
   },
-  from: (table: string) => ({
-    select: (columns?: string) => ({
-      eq: (column: string, value: any) => ({
-        single: async () => {
-          if (table === 'users' && column === 'id') {
-            return { data: mockUser, error: null };
-          }
-          return { data: null, error: null };
-        }
-      }),
-      order: (column: string, options?: any) => mockApi.getProducts(),
-      then: async (resolve: any) => {
-        if (table === 'products') {
-          const result = await mockApi.getProducts();
-          resolve(result);
-        }
-        return { data: [], error: null };
-      }
-    }),
-    insert: async (data: any) => ({ data, error: null }),
-    update: async (data: any) => ({ data, error: null }),
-    delete: async () => ({ data: null, error: null })
-  })
+  realtime: {
+    params: {
+      eventsPerSecond: 10,
+    },
+  },
+});
+
+// Test connection
+export const testConnection = async () => {
+  try {
+    const { data, error } = await supabase.from('connection_test').select('*').limit(1);
+    return { connected: !error, error };
+  } catch (error) {
+    return { connected: false, error };
+  }
 };
 
-// Export the appropriate client
-export const db = supabase || mockSupabase;
-
-// Helper to check if we're using mock mode
-export const isMockMode = !hasSupabaseCredentials;
 export type Database = {
   public: {
     Tables: {

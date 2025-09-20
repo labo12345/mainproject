@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { supabase, isMockMode } from '../lib/supabase';
+import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../contexts/AuthContext';
 import toast from 'react-hot-toast';
 
@@ -33,7 +33,7 @@ export function useCart() {
   }, [user]);
 
   const loadCart = async () => {
-    if (!user || isMockMode) {
+    if (!user) {
       // Load from localStorage for non-authenticated users
       const savedCart = localStorage.getItem('quicklink_cart');
       if (savedCart) {
@@ -43,7 +43,6 @@ export function useCart() {
       return;
     }
 
-    if (supabase) {
       try {
       const { data, error } = await supabase
         .from('cart_items')
@@ -73,7 +72,6 @@ export function useCart() {
       } catch (error) {
         console.error('Error loading cart:', error);
       }
-    }
   };
 
   const calculateCartTotals = (cartData: { items: CartItem[] }): Cart => {
@@ -90,13 +88,12 @@ export function useCart() {
   const saveCart = async (newCart: Cart) => {
     setCart(newCart);
 
-    if (!user || isMockMode) {
+    if (!user) {
       // Save to localStorage for non-authenticated users
       localStorage.setItem('quicklink_cart', JSON.stringify(newCart.items));
       return;
     }
 
-    if (supabase) {
       try {
       // Clear existing cart items
       await supabase
@@ -131,7 +128,6 @@ export function useCart() {
       } catch (error) {
         console.error('Error saving cart:', error);
       }
-    }
   };
 
   const addToCart = async (item: Omit<CartItem, 'id' | 'quantity'> & { quantity?: number }) => {
@@ -213,7 +209,7 @@ export function useCart() {
   const clearCart = async () => {
     setIsLoading(true);
     try {
-      if (user && !isMockMode && supabase) {
+      if (user) {
         await supabase
           .from('cart_items')
           .delete()

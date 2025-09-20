@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
-import { supabase, db, isMockMode, mockSupabase } from '../lib/supabase';
-import { mockUser } from '../lib/mockData';
+import { supabase } from '../lib/supabase';
 import type { Database } from '../lib/supabase';
 
 type UserProfile = Database['public']['Tables']['users']['Row'];
@@ -13,30 +12,19 @@ export function useAuth() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (isMockMode) {
-      // Mock mode - check localStorage for user
-      const mockUserData = localStorage.getItem('mock_user');
-      if (mockUserData) {
-        const userData = JSON.parse(mockUserData);
-        setUser(userData);
-        setProfile(userData);
-        setSession({ user: userData, access_token: 'mock-token' } as any);
+    // Get current session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        fetchProfile(session.user.id);
+      } else {
+        setLoading(false);
       }
-      setLoading(false);
-    } else {
-      // Real Supabase mode
-      supabase!.auth.getSession().then(({ data: { session } }) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        if (session?.user) {
-          fetchProfile(session.user.id);
-        } else {
-          setLoading(false);
-        }
-      });
+    });
 
-      // Listen for auth changes
-      const { data: { subscription } } = supabase!.auth.onAuthStateChange(
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
         async (event, session) => {
           setSession(session);
           setUser(session?.user ?? null);
@@ -48,21 +36,15 @@ export function useAuth() {
             setLoading(false);
           }
         }
-      );
+    );
 
-      return () => subscription.unsubscribe();
-    }
+    return () => subscription.unsubscribe();
   }, []);
 
   const fetchProfile = async (userId: string) => {
-    if (isMockMode) {
-      setProfile(mockUser as any);
-      setLoading(false);
-      return;
-    }
-
     try {
-      const { data, error } = await supabase!
+      setLoading(true);
+      const { data, error } = await supabase
         .from('users')
         .select('*')
         .eq('id', userId)
@@ -81,18 +63,11 @@ export function useAuth() {
   };
 
   const signOut = async () => {
-    if (isMockMode) {
-      localStorage.removeItem('mock_user');
-      setUser(null);
-      setProfile(null);
-      setSession(null);
-    } else {
-      const { error } = await supabase!.auth.signOut();
+      const { error } = await supabase.auth.signOut();
       if (error) {
         console.error('Error signing out:', error);
         throw error;
       }
-    }
   };
 
   const hasRole = (requiredRole: string | string[]) => {
@@ -118,6 +93,5 @@ export function useAuth() {
     isDriver: profile?.role === 'driver',
     isCustomer: profile?.role === 'customer',
     isPropertySeller: profile?.role === 'property_seller',
-    isMockMode,
   };
 }

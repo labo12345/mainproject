@@ -25,7 +25,7 @@ const navigation = [
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
-  const { isAuthenticated, profile, signOut, isMockMode } = useAuthContext();
+  const { isAuthenticated, profile, signOut } = useAuthContext();
   const { itemCount } = useCart();
 
   const handleSignOut = async () => {
@@ -44,9 +44,6 @@ export default function Header() {
           <Link to="/" className="-m-1.5 p-1.5">
             <span className="text-2xl font-bold text-red-800">QUICKLINK</span>
             <span className="text-2xl font-bold text-yellow-600 ml-1">SERVICES</span>
-            {isMockMode && (
-              <span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">DEMO</span>
-            )}
           </Link>
         </div>
 

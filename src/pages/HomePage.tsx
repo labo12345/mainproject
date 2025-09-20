@@ -12,8 +12,6 @@ import {
   PhoneIcon
 } from '@heroicons/react/24/outline';
 
-import { useAuthContext } from '../contexts/AuthContext';
-
 const services = [
   {
     name: 'Marketplace',
@@ -80,19 +78,12 @@ const stats = [
 ];
 
 export default function HomePage() {
-  const { isMockMode } = useAuthContext();
-
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
       <section className="relative bg-gradient-to-r from-red-800 to-red-600 text-white">
         <div className="mx-auto max-w-7xl px-6 py-24 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
-            {isMockMode && (
-              <div className="mb-6 inline-flex items-center px-4 py-2 rounded-full bg-blue-100 text-blue-800 text-sm font-medium">
-                🚀 Demo Mode - Explore all features without setup
-              </div>
-            )}
             <motion.h1 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -109,11 +100,6 @@ export default function HomePage() {
               className="mt-6 text-lg leading-8 text-gray-100"
             >
               QUICKLINK SERVICES connects you with local stores, restaurants, drivers and trusted service professionals. Fast, secure, and reliable.
-              {isMockMode && (
-                <span className="block mt-2 text-yellow-200 font-medium">
-                  Currently running in demo mode with sample data
-                </span>
-              )}
             </motion.p>
             <motion.div 
               initial={{ opacity: 0, y: 20 }}

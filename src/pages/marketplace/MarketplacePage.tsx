@@ -8,8 +8,7 @@ import {
   ShoppingCartIcon,
   HeartIcon
 } from '@heroicons/react/24/outline';
-import { supabase, isMockMode, mockSupabase } from '../../lib/supabase';
-import { mockProducts, mockApi } from '../../lib/mockData';
+import { supabase } from '../../lib/supabase';
 import { useCart } from '../../hooks/useCart';
 import { useAuthContext } from '../../contexts/AuthContext';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
@@ -69,69 +68,51 @@ export default function MarketplacePage() {
   const fetchProducts = async () => {
     setIsLoading(true);
     try {
-      if (isMockMode) {
-        // Use mock data
-        const { data, error } = await mockApi.getProducts({
-          category: selectedCategory,
-          search: searchQuery,
-          sortBy: sortBy
-        });
-        
-        if (error) {
-          console.error('Error fetching products:', error);
-          toast.error('Failed to load products');
-          return;
-        }
-        
-        setProducts(data || []);
-      } else if (supabase) {
-        // Use real Supabase
-        let query = supabase
-          .from('products')
-          .select(`
-            *,
-            sellers (shop_name)
-          `)
-          .eq('is_active', true);
+      let query = supabase
+        .from('products')
+        .select(`
+          *,
+          sellers (shop_name)
+        `)
+        .eq('is_active', true);
 
-        // Apply category filter
-        if (selectedCategory !== 'All') {
-          query = query.eq('category', selectedCategory);
-        }
-
-        // Apply search filter
-        if (searchQuery.trim()) {
-          query = query.or(`name.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%`);
-        }
-
-        // Apply sorting
-        switch (sortBy) {
-          case 'price_asc':
-            query = query.order('price', { ascending: true });
-            break;
-          case 'price_desc':
-            query = query.order('price', { ascending: false });
-            break;
-          case 'rating':
-            query = query.order('rating', { ascending: false });
-            break;
-          case 'reviews':
-            query = query.order('reviews_count', { ascending: false });
-            break;
-          default:
-            query = query.order('name', { ascending: true });
-        }
-
-        const { data, error } = await query;
-
-        if (error) {
-          console.error('Error fetching products:', error);
-          toast.error('Failed to load products');
-          return;
-        }
-
-        setProducts(data || []);
+      // Apply category filter
+      if (selectedCategory !== 'All') {
+        query = query.eq('category', selectedCategory);
       }
+
+      // Apply search filter
+      if (searchQuery.trim()) {
+        query = query.or(`name.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%`);
+      }
+
+      // Apply sorting
+      switch (sortBy) {
+        case 'price_asc':
+          query = query.order('price', { ascending: true });
+          break;
+        case 'price_desc':
+          query = query.order('price', { ascending: false });
+          break;
+        case 'rating':
+          query = query.order('rating', { ascending: false });
+          break;
+        case 'reviews':
+          query = query.order('reviews_count', { ascending: false });
+          break;
+        default:
+          query = query.order('name', { ascending: true });
+      }
+
+      const { data, error } = await query;
+
+      if (error) {
+        console.error('Error fetching products:', error);
+        toast.error('Failed to load products');
+        return;
+      }
+
+      setProducts(data || []);
     } catch (error) {
       console.error('Error fetching products:', error);
       toast.error('Failed to load products');
@@ -141,7 +122,7 @@ export default function MarketplacePage() {
   };
 
   const handleAddToCart = async (product: Product) => {
-    if (!isAuthenticated && !isMockMode) {
+    if (!isAuthenticated) {
       toast.error('Please sign in to add items to cart');
       return;
     }
@@ -172,9 +153,6 @@ export default function MarketplacePage() {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Marketplace</h1>
-              {isMockMode && (
-                <p className="text-sm text-blue-600 mt-1">Demo Mode - Sample Products</p>
-              )}
             </div>
             
             {/* Search Bar */}
