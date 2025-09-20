@@ -9,6 +9,7 @@
              <Route path="/errands" element={<ErrandsPage />} />
              <Route path="/cart" element={<CartPage />} />
              <Route path="/dashboard" element={<DashboardPage />} />
+}
 +            <Route path="/connection-test" element={<ConnectionTestPage />} />
            </Routes>
            <Footer />

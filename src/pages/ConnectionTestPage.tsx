@@ -114,7 +114,7 @@ export default function ConnectionTestPage() {
                     <h3 className="text-sm font-medium text-blue-800">Database Information</h3>
                     <div className="mt-2 text-sm text-blue-700 space-y-1">
                       <p><strong>URL:</strong> {import.meta.env.VITE_SUPABASE_URL}</p>
-                      <p><strong>Project:</strong> {import.meta.env.VITE_SUPABASE_URL?.split('//')[1]?.split('.')[0] || 'Unknown'}</p>
+                      <p><strong>Project:</strong> {import.meta.env.VITE_SUPABASE_URL?.split('//')[1]?.split('.')[0] || \'Unknown'}</p>
                       <p><strong>Environment:</strong> {import.meta.env.MODE}</p>
                     </div>
                   </div>
