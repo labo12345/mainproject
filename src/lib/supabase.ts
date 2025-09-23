@@ -8,6 +8,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     persistSession: true,
     autoRefreshToken: true,
+    detectSessionInUrl: true,
   },
   realtime: {
     params: {
@@ -19,11 +20,57 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 // Test connection
 export const testConnection = async () => {
   try {
-    const { data, error } = await supabase.from('connection_test').select('*').limit(1);
+    const { data, error } = await supabase.from('products').select('id, name').limit(1);
     return { connected: !error, error };
   } catch (error) {
     return { connected: false, error };
   }
+};
+
+// Helper function to handle auth state changes
+export const onAuthStateChange = (callback: (event: string, session: any) => void) => {
+  return supabase.auth.onAuthStateChange(callback);
+};
+
+// Helper function to sign up with email
+export const signUpWithEmail = async (email: string, password: string, userData: any) => {
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      data: userData,
+    },
+  });
+  
+  if (data.user && !error) {
+    // Create user profile
+    const { error: profileError } = await supabase
+      .from('users')
+      .insert({
+        id: data.user.id,
+        email: data.user.email!,
+        full_name: userData.full_name,
+        phone: userData.phone,
+        role: userData.role || 'customer',
+        kyc_status: 'pending',
+      });
+    
+    if (profileError) {
+      console.error('Error creating user profile:', profileError);
+    }
+  }
+  
+  return { data, error };
+};
+
+// Helper function to sign in with email
+export const signInWithEmail = async (email: string, password: string) => {
+  return await supabase.auth.signInWithPassword({ email, password });
+};
+
+// Helper function to sign out
+export const signOut = async () => {
+  return await supabase.auth.signOut();
 };
 
 export type Database = {

@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { EyeIcon, EyeSlashIcon, CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/outline';
-import { supabase } from '../../lib/supabase';
+import { signUpWithEmail, supabase } from '../../lib/supabase';
 import toast from 'react-hot-toast';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
 
@@ -62,17 +62,15 @@ export default function SignUpPage() {
   const onSubmit = async (data: SignUpForm) => {
     setIsLoading(true);
     try {
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-          email: data.email,
-          password: data.password,
-          options: {
-            data: {
-              full_name: data.fullName,
-              phone: data.phone,
-              role: data.role,
-            },
-          },
-        });
+      const { data: authData, error: authError } = await signUpWithEmail(
+        data.email,
+        data.password,
+        {
+          full_name: data.fullName,
+          phone: data.phone,
+          role: data.role,
+        }
+      );
 
         if (authError) {
           toast.error(authError.message);
@@ -80,22 +78,6 @@ export default function SignUpPage() {
         }
 
         if (authData.user) {
-          // Create user profile
-          const { error: profileError } = await supabase
-            .from('users')
-            .insert({
-              id: authData.user.id,
-              email: data.email,
-              full_name: data.fullName,
-              phone: data.phone,
-              role: data.role,
-              kyc_status: 'pending',
-            });
-
-          if (profileError) {
-            console.error('Error creating profile:', profileError);
-          }
-
           toast.success('Account created successfully!');
           navigate('/dashboard');
         }

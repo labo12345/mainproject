@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
-import { supabase } from '../lib/supabase';
+import { supabase, onAuthStateChange } from '../lib/supabase';
 import type { Database } from '../lib/supabase';
 
 type UserProfile = Database['public']['Tables']['users']['Row'];
@@ -24,7 +24,7 @@ export function useAuth() {
     });
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+    const { data: { subscription } } = onAuthStateChange(
         async (event, session) => {
           setSession(session);
           setUser(session?.user ?? null);
@@ -51,7 +51,12 @@ export function useAuth() {
         .single();
 
       if (error) {
-        console.error('Error fetching profile:', error);
+        // If user doesn't exist in users table, this might be a new user
+        if (error.code === 'PGRST116') {
+          console.log('User profile not found, might be a new user');
+        } else {
+          console.error('Error fetching profile:', error);
+        }
       } else {
         setProfile(data);
       }
@@ -63,11 +68,11 @@ export function useAuth() {
   };
 
   const signOut = async () => {
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        console.error('Error signing out:', error);
-        throw error;
-      }
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error('Error signing out:', error);
+      throw error;
+    }
   };
 
   const hasRole = (requiredRole: string | string[]) => {

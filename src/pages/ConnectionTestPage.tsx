@@ -35,7 +35,7 @@ export default function ConnectionTestPage() {
 
       if (result.connected) {
         // Fetch some test data
-        const { data } = await supabase.from('connection_test').select('*').limit(5);
+        const { data } = await supabase.from('products').select('id, name, price, created_at').limit(5);
         setTestData(data || []);
       }
     } catch (error) {
@@ -138,7 +138,10 @@ export default function ConnectionTestPage() {
                         ID
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Message
+                        Name
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Price
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Created At
@@ -149,10 +152,13 @@ export default function ConnectionTestPage() {
                     {testData.map((row) => (
                       <tr key={row.id}>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                          {row.id}
+                          {row.id?.substring(0, 8)}...
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {row.message || 'No message'}
+                          {row.name || 'No name'}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          KES {row.price?.toLocaleString() || '0'}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           {row.created_at ? new Date(row.created_at).toLocaleString() : 'N/A'}
@@ -164,7 +170,7 @@ export default function ConnectionTestPage() {
               </div>
             ) : (
               <p className="text-gray-500 text-center py-4">
-                No test data found in connection_test table
+                No products found in database
               </p>
             )}
           </div>
@@ -175,9 +181,9 @@ export default function ConnectionTestPage() {
           <h2 className="text-xl font-semibold text-gray-900 mb-4">Next Steps</h2>
           <div className="space-y-3 text-sm text-gray-600">
             <p>✅ <strong>Connection established</strong> - Your app can communicate with Supabase</p>
-            <p>🔄 <strong>Run migrations</strong> - Execute the SQL migrations to create your tables</p>
+            <p>✅ <strong>Database schema ready</strong> - All tables and policies are set up</p>
+            <p>✅ <strong>Sample data loaded</strong> - Products, restaurants, and properties available</p>
             <p>🔐 <strong>Setup authentication</strong> - Configure Google OAuth and email providers</p>
-            <p>📊 <strong>Seed data</strong> - Add sample products, restaurants, and users</p>
             <p>🚀 <strong>Deploy</strong> - Your app is ready for production deployment</p>
           </div>
         </div>

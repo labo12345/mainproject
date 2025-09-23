@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
-import { supabase } from '../../lib/supabase';
+import { signInWithEmail } from '../../lib/supabase';
 import toast from 'react-hot-toast';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
 
@@ -35,10 +35,7 @@ export default function SignInPage() {
   const onSubmit = async (data: SignInForm) => {
     setIsLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-          email: data.email,
-          password: data.password,
-        });
+      const { error } = await signInWithEmail(data.email, data.password);
 
         if (error) {
           toast.error(error.message);
