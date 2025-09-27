@@ -1,3 +1,6 @@
+import React from 'react';
+import { useAuthContext } from '../contexts/AuthContext';
+
 export default function DashboardPage() {
   const { profile } = useAuthContext();
 
@@ -13,35 +16,35 @@ export default function DashboardPage() {
       title: 'Ride Booking',
       description: 'Book a ride to your destination',
       icon: '🚗',
-      href: '/rides',
+      href: '/taxi',
       color: 'bg-blue-500'
     },
     {
       title: 'Package Delivery',
       description: 'Send packages across the city',
       icon: '📦',
-      href: '/packages',
+      href: '/errands',
       color: 'bg-green-500'
     },
     {
       title: 'Grocery Shopping',
       description: 'Shop for groceries and essentials',
       icon: '🛒',
-      href: '/grocery',
+      href: '/marketplace',
       color: 'bg-purple-500'
     },
     {
-      title: 'Pharmacy',
-      description: 'Order medicines and health products',
-      icon: '💊',
-      href: '/pharmacy',
+      title: 'Properties',
+      description: 'Find your next home or investment',
+      icon: '🏠',
+      href: '/properties',
       color: 'bg-red-500'
     },
     {
-      title: 'Laundry Service',
-      description: 'Professional laundry and dry cleaning',
-      icon: '👕',
-      href: '/laundry',
+      title: 'Cart',
+      description: 'View your shopping cart',
+      icon: '🛍️',
+      href: '/cart',
       color: 'bg-indigo-500'
     }
   ];
@@ -54,7 +57,7 @@ export default function DashboardPage() {
           <div className="flex justify-between items-center py-6">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">
-                Welcome back, {profile?.name || 'User'}!
+                Welcome back, {profile?.full_name || 'User'}!
               </h1>
               <p className="text-gray-600 capitalize">
                 {profile?.role || 'Customer'} Dashboard
@@ -65,13 +68,6 @@ export default function DashboardPage() {
               <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
                 Quick Order
               </button>
-              <div className="relative">
-                <button className="p-2 text-gray-400 hover:text-gray-600">
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-5 5-5-5h5V3h0z" />
-                  </svg>
-                </button>
-              </div>
             </div>
           </div>
         </div>
@@ -89,9 +85,7 @@ export default function DashboardPage() {
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Total Orders</p>
-                <p className="text-2xl font-semibold text-gray-900">
-                  12
-                </p>
+                <p className="text-2xl font-semibold text-gray-900">12</p>
               </div>
             </div>
           </div>
@@ -105,9 +99,7 @@ export default function DashboardPage() {
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Rides Taken</p>
-                <p className="text-2xl font-semibold text-gray-900">
-                  8
-                </p>
+                <p className="text-2xl font-semibold text-gray-900">8</p>
               </div>
             </div>
           </div>
@@ -121,9 +113,7 @@ export default function DashboardPage() {
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Wallet Balance</p>
-                <p className="text-2xl font-semibold text-gray-900">
-                  KES 2,500
-                </p>
+                <p className="text-2xl font-semibold text-gray-900">KES 2,500</p>
               </div>
             </div>
           </div>
@@ -137,9 +127,7 @@ export default function DashboardPage() {
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Notifications</p>
-                <p className="text-2xl font-semibold text-gray-900">
-                  3
-                </p>
+                <p className="text-2xl font-semibold text-gray-900">3</p>
               </div>
             </div>
           </div>
